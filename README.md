@@ -1,1 +1,127 @@
-# despertador-solar
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Despertador solar">
+<title>Despertador solar</title>
+<style>
+:root{--bg:#fff;--fg:#000;--card:#f2f2f7;--mut:#8e8e93;--sep:#d1d1d6;--acc:#ff9f0a;--ok:#34c759;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--card:#1c1c1e;--mut:#8e8e93;--sep:#38383a}}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff;--card:#1c1c1e;--mut:#8e8e93;--sep:#38383a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif}
+#app{max-width:480px;margin:0 auto;padding:12px 20px 120px}
+.top{display:flex;justify-content:flex-end}
+.plus{background:none;border:0;color:var(--acc);font-size:2.2rem;line-height:1;padding:4px 8px;cursor:pointer}
+h1{font-size:2.1rem;margin:0 0 4px;font-weight:700}
+#nx{color:var(--mut);font-size:.95rem;margin-bottom:14px}
+ul{list-style:none;margin:0;padding:0;background:transparent}
+li{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--sep);cursor:pointer}
+li .tm{font-size:3.4rem;font-weight:300;line-height:1;letter-spacing:-1px}
+li .lb{color:var(--mut);font-size:.9rem;margin-top:4px}
+li.off .tm,li.off .lb{color:var(--mut)}
+.sw{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:16px;background:#78788052;position:relative;transition:.2s;flex:none;border:0;outline:0}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px #0004;transition:.2s}
+.sw:checked{background:var(--ok)}.sw:checked::after{left:22px}
+#empty{color:var(--mut);padding:30px 0;text-align:center}
+.lnk{background:none;border:0;color:var(--acc);font:inherit;font-size:1rem;cursor:pointer;padding:10px 0}
+#bottom{position:fixed;left:0;right:0;bottom:0;padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 35%);display:flex;flex-direction:column;align-items:center;gap:2px}
+#start{width:100%;max-width:440px;background:var(--acc);color:#000;border:0;border-radius:14px;padding:16px;font:inherit;font-size:1.1rem;font-weight:600;cursor:pointer}
+#start:disabled{opacity:.4}
+#sheet{position:fixed;inset:0;background:var(--bg);display:none;overflow:auto;z-index:5;padding-top:env(safe-area-inset-top,0px)}
+#sheet .in{max-width:480px;margin:0 auto;padding:14px 20px calc(30px + env(safe-area-inset-bottom,0px))}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hd b{font-size:1.05rem}
+.wh{display:flex;justify-content:center;gap:4px;position:relative;height:160px;margin:10px 0 18px}
+.wh::before{content:"";position:absolute;left:0;right:0;top:60px;height:40px;background:var(--card);border-radius:10px;z-index:0}
+.col{width:90px;height:160px;overflow-y:scroll;scroll-snap-type:y mandatory;padding:60px 0;position:relative;z-index:1;scrollbar-width:none}
+.col::-webkit-scrollbar{display:none}
+.col div{height:40px;line-height:40px;text-align:center;font-size:1.7rem;scroll-snap-align:center}
+.sep{align-self:center;font-size:1.7rem;z-index:1}
+.grp{background:var(--card);border-radius:12px;padding:0 14px;margin-bottom:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--sep)}
+.row:last-child{border:0}
+.row input[type=text],.row select{background:none;border:0;color:var(--mut);font:inherit;text-align:right;outline:0;max-width:60%}
+.del{width:100%;background:var(--card);color:#ff453a;border:0;border-radius:12px;padding:14px;font:inherit;font-size:1.05rem;cursor:pointer}
+#sun{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#000;text-align:center;padding:24px;z-index:9}
+#clock{font-size:4.8rem;font-weight:200;font-variant-numeric:tabular-nums}
+#info{font-size:1.05rem}
+#stop{position:absolute;bottom:calc(32px + env(safe-area-inset-bottom,0px));background:rgba(0,0,0,.35);color:inherit;border:1px solid currentColor;border-radius:30px;padding:14px 34px;font:inherit}
+</style></head><body>
+<div id="app">
+ <div class="top"><button class="plus" id="add" aria-label="Añadir alarma">+</button></div>
+ <h1>Despertador</h1>
+ <div id="nx"></div>
+ <ul id="ls"></ul>
+ <div id="empty">No hay alarmas. Pulsa + para crear una.</div>
+ <button class="lnk" id="test">Probar el amanecer (30 s)</button>
+ <p style="color:var(--mut);font-size:.8rem;line-height:1.5">Deja esta pantalla abierta, el móvil cargando y el brillo al máximo. Al iniciar, la pantalla queda negra y se ilumina sola con luz cálida antes de la hora.</p>
+</div>
+<div id="bottom"><button id="start">Iniciar amanecer</button></div>
+
+<div id="sheet"><div class="in">
+ <div class="hd"><button class="lnk" id="cn">Cancelar</button><b id="tt">Añadir alarma</b><button class="lnk" id="sv" style="font-weight:600">Guardar</button></div>
+ <div class="wh"><div class="col" id="wh"></div><div class="sep">:</div><div class="col" id="wm"></div></div>
+ <div class="grp">
+  <div class="row"><span>Etiqueta</span><input type="text" id="lb" placeholder="Despertador" maxlength="24"></div>
+  <div class="row"><span>Amanecer previo</span><select id="du"><option value="10">10 min</option><option value="20">20 min</option><option value="30">30 min</option><option value="45">45 min</option><option value="60">60 min</option></select></div>
+  <div class="row"><span>Sonido suave al final</span><input type="checkbox" class="sw" id="sn"></div>
+ </div>
+ <button class="del" id="dl">Eliminar alarma</button>
+</div></div>
+
+<div id="sun"><div id="clock">--:--</div><div id="info"></div><button id="stop">Parar</button></div>
+
+<video id="ns" muted playsinline loop src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAN2bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAqB0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAQAAABAAAAAAIYbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABw21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAYNzdGJsAAAAv3N0c2QAAAAAAAAAAQAAAK9hdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAANWF2Y0MBZAAK/+EAGGdkAAqs2UQmwEQAAAMABAAAAwAoPEiWWAEABmjr48siwP34+AAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAYQAAAGEAAAAAYc3R0cwAAAAAAAAABAAAABQAACAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAADhjdHRzAAAAAAAAAAUAAAABAAAQAAAAAAEAACgAAAAAAQAAEAAAAAABAAAAAAAAAAEAAAgAAAAAHHN0c2MAAAAAAAAAAQAAAAEAAAAFAAAAAQAAAChzdHN6AAAAAAAAAAAAAAAFAAAC1gAAAA4AAAAMAAAADAAAAAwAAAAUc3RjbwAAAAAAAAABAAADpgAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjAuMTYuMTAwAAAACGZyZWUAAAMQbWRhdAAAAq0GBf//qdxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjQgcjMxMDggMzFlMTlmOSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjMgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj01IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAIWWIhAAS//73rd+BTcMrNWu6Vzi0la3kA5MtsETUVp4u9wAAAApBmiRsQ//+qZ00AAAACEGeQniCHwLHAAAACAGeYXRD/wTEAAAACAGeY2pD/wTF" style="position:fixed;left:0;top:0;width:2px;height:2px;opacity:.02;pointer-events:none"></video>
+<script>
+var $=function(i){return document.getElementById(i)};
+var A=[],edit=-1;
+try{A=JSON.parse(localStorage.getItem("dsA")||"[]")}catch(e){}
+function save(){try{localStorage.setItem("dsA",JSON.stringify(A))}catch(e){}}
+function p2(n){return("0"+n).slice(-2)}
+function nextOcc(a){var h=a.t.split(":"),d=new Date();d.setHours(+h[0],+h[1],0,0);if(d.getTime()<=Date.now())d.setDate(d.getDate()+1);return d.getTime()}
+function nextAlarm(){var b=null,bt=0;A.forEach(function(a){if(!a.on)return;var t=nextOcc(a);if(!b||t<bt){b=a;bt=t}});return b?{a:b,t:bt}:null}
+function render(){
+ var L=$("ls");L.innerHTML="";
+ A.slice().sort(function(x,y){return x.t<y.t?-1:1}).forEach(function(a){
+  var li=document.createElement("li");if(!a.on)li.className="off";
+  li.innerHTML='<div><div class="tm">'+a.t+'</div><div class="lb">'+(a.l||"Despertador").replace(/</g,"&lt;")+' · amanece '+a.d+' min antes</div></div>';
+  var s=document.createElement("input");s.type="checkbox";s.className="sw";s.checked=a.on;
+  s.onclick=function(e){e.stopPropagation()};
+  s.onchange=function(){a.on=s.checked;save();render()};
+  li.appendChild(s);li.onclick=function(){openSheet(A.indexOf(a))};L.appendChild(li)});
+ $("empty").style.display=A.length?"none":"block";
+ var n=nextAlarm(),b=$("start");
+ if(n){var m=Math.round((n.t-Date.now())/60000),h=Math.floor(m/60);
+  $("nx").textContent="Próxima alarma en "+(h?h+" h ":"")+(m%60)+" min";
+  b.disabled=false;b.textContent="Iniciar amanecer · "+n.a.t}
+ else{$("nx").textContent="Sin alarmas activas";b.disabled=true;b.textContent="Iniciar amanecer"}
+}
+(function(){var h="",m="";for(var i=0;i<24;i++)h+="<div>"+p2(i)+"</div>";for(i=0;i<60;i++)m+="<div>"+p2(i)+"</div>";$("wh").innerHTML=h;$("wm").innerHTML=m})();
+function openSheet(i){
+ edit=i;var a=i>=0?A[i]:{t:"07:00",d:30,l:"",s:false};
+ $("tt").textContent=i>=0?"Editar alarma":"Añadir alarma";
+ $("lb").value=a.l||"";$("du").value=a.d;$("sn").checked=!!a.s;
+ $("dl").style.display=i>=0?"block":"none";
+ $("sheet").style.display="block";
+ var t=a.t.split(":");$("wh").scrollTop=+t[0]*40;$("wm").scrollTop=+t[1]*40;
+}
+$("add").onclick=function(){openSheet(-1)};
+$("cn").onclick=function(){$("sheet").style.display="none"};
+$("sv").onclick=function(){
+ var o={t:p2(Math.round($("wh").scrollTop/40))+":"+p2(Math.round($("wm").scrollTop/40)),d:+$("du").value,l:$("lb").value.trim(),s:$("sn").checked,on:true};
+ if(edit>=0)A[edit]=o;else A.push(o);
+ save();$("sheet").style.display="none";render()};
+$("dl").onclick=function(){if(edit>=0){A.splice(edit,1);save()}$("sheet").style.display="none";render()};
+
+var stops=[[0,[0,0,0]],[.2,[45,8,0]],[.45,[140,35,5]],[.7,[255,125,35]],[.88,[255,180,90]],[1,[255,222,165]]];
+var timer=null,lock=null,startAt=0,endAt=0,ring=false,snd=false,audio=null,beep=null,peek=0;
+function color(p){for(var i=1;i<stops.length;i++)if(p<=stops[i][0]){var a=stops[i-1],b=stops[i],k=(p-a[0])/(b[0]-a[0]);return a[1].map(function(v,j){return Math.round(v+(b[1][j]-v)*k)})}return stops[5][1]}
+function fmt(d){return d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})}
+async function wake(){try{if("wakeLock" in navigator)lock=await navigator.wakeLock.request("screen")}catch(e){}}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&timer){wake();try{$("ns").play().catch(function(){})}catch(x){}}});
+function startBeep(){try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();var o=audio.createOscillator(),g=audio.createGain();o.type="sine";o.frequency.value=660;o.connect(g);g.connect(audio.destination);g.gain.value=0;o.start();var t0=audio.currentTime;for(var i=0;i
